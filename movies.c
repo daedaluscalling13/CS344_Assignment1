@@ -204,6 +204,38 @@ void printMovieFromYear(char* year, struct movie* list)
     }
 }
 
+// PROMPT 3
+// Get the specified language
+char* getSpecifiedLanguage(void){
+    char* language = calloc(sizeof(char), 20);
+    printf("Enter the language for which you want to see movies: ");
+    scanf("%s", language);
+    return language;
+}
+
+// Print movies for the specified language (prompt 3)
+void printMovieFromLanguage(char* language, struct movie* list)
+{
+    int count = 0;
+    while (list != NULL)
+    {
+        for (int i = 0; i < 5; i++){
+            if(strcmp(list->languages[i], language) == 0)
+            {
+                printf("%s %s\n", list->year, list->title);
+                count++;
+                break;
+            }
+        }
+        list = list->next;
+    }
+
+    if (count == 0)
+    {
+        printf("No data about movies released in %s.\n", language);
+    }
+}
+
 // Prompt was not a valid choice, notify user.
 void invalidPrompt(void)
 {
@@ -234,6 +266,7 @@ int main(int argc, char *argv[])
 
     int prompt;
     char* year = NULL;
+    char* language = NULL;
     do{
         prompt = receivePrompt();
         printf("You entered %d.\n", prompt);
@@ -244,6 +277,9 @@ int main(int argc, char *argv[])
                 free(year);
             case 2:
             case 3:
+                language = getSpecifiedLanguage();
+                printMovieFromLanguage(language, list);
+                free(language);
             case 4:
                 continue;
             default:
