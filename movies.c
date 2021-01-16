@@ -145,11 +145,38 @@ void printMovieList(struct movie* list)
     }
 }
 
+// Gets lenght of the movie linked list created after file processing
+int getListLength(struct movie* list)
+{
+    int movieCount = 0;
+    while (list != NULL)
+    {
+        movieCount++;
+        list = list->next;
+    }
+    return movieCount;
+}
+
+int receivePrompt(void)
+{
+    printf("\n");
+    printf("1. Show movies released in the specified year\n");
+    printf("2. Show highest rate movie for each year\n");
+    printf("3. Show the title and year of release of all movies in a specific language\n");
+    printf("4. Exit the program\n");
+    printf("\n");
+    printf("Enter a choice from 1 to 4: ");
+    
+    char* prompt = calloc(sizeof(char), 16);
+    scanf("%s", prompt);
+    return atoi(prompt);
+}
+
 /*
 *   Process the file provided as an argument to the program to
 *   create a linked list of student structs and print out the list.
 *   Compile the program as follows:
-*       gcc --std=gnu99 -o students main.c
+*       gcc --std=gnu99 -o movies movies.c
 */
 
 int main(int argc, char *argv[])
@@ -161,6 +188,14 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     struct movie* list = processFile(argv[1]);
-    printMovieList(list);
+    // printMovieList(list);
+    int movieCount = getListLength(list);
+    printf("Processed file %s and parsed data for %d movies.\n", argv[1], movieCount);
+    int prompt;
+    do{
+        prompt = receivePrompt();
+        printf("You entered %d.\n", prompt);
+    } while(prompt != 4);   
+
     return EXIT_SUCCESS;
 }
