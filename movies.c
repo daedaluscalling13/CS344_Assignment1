@@ -9,6 +9,7 @@
 /* struct for movie information */
 struct movie
 {
+    // Cheating and only using strings. Conversions aren't great.
     char* title;
     char* year;
     char languages[5][20];
@@ -124,27 +125,6 @@ struct movie* processFile(char *filePath)
     return head;
 }
 
-/*
-* Print data for the given movie
-*/
-void printMovie(struct movie* aMovie){
-  printf("%s %s %s %s\n", aMovie->title,
-               aMovie->year,
-               aMovie->languages,
-               aMovie->rating);
-}
-/*
-* Print the linked list of movies
-*/
-void printMovieList(struct movie* list)
-{
-    while (list != NULL)
-    {
-        printMovie(list);
-        list = list->next;
-    }
-}
-
 // Gets lenght of the movie linked list created after file processing
 int getListLength(struct movie* list)
 {
@@ -204,6 +184,62 @@ void printMovieFromYear(char* year, struct movie* list)
     }
 }
 
+// PROMPT 2
+// Gross way to get the max for each year
+void printYearHighestRatedMovie(struct movie* list)
+{
+
+    // Declaring vars
+    struct movie* currMovie = list;
+    char* currYear = NULL;
+    struct movie* currList = NULL;
+    struct movie* maxMovie = NULL;
+
+    // Loop through the list of movies
+    // For each movie, find if the current movie is the highest rated for that year.
+    // If it is, print the movie.
+    while(currMovie != NULL)
+    {
+        currList = list;
+        currYear = currMovie->year;
+        maxMovie = NULL;
+
+        // Loop through the list of movies to find other movies from the same year.
+        // This is inefficient.
+        while (currList != NULL)
+        {
+            if (strcmp(currList->year, currYear) == 0)
+            {
+                // No max movie, therefore first one found is max
+                if (maxMovie == NULL)
+                {
+                    maxMovie = currList;
+                }
+
+                // Is the max movie higher rated than the current movie?
+                else
+                {
+                    char* ptr;
+                    if (strtod(maxMovie->rating, &ptr) < strtod(currList->rating, &ptr))
+                    {
+                        maxMovie = currList;
+                    }
+                }
+            }
+            currList = currList->next;
+        }
+
+        if (strcmp(maxMovie->title, currMovie->title) == 0)
+        {
+            printf("%s %s %s\n", currMovie->year, currMovie->rating, currMovie->title);
+        }
+
+        currMovie = currMovie->next;
+    }
+
+    return;
+}
+
 // PROMPT 3
 // Get the specified language
 char* getSpecifiedLanguage(void){
@@ -260,7 +296,6 @@ int main(int argc, char *argv[])
     }
 
     struct movie* list = processFile(argv[1]);
-    // printMovieList(list);
     int movieCount = getListLength(list);
     printf("Processed file %s and parsed data for %d movies.\n", argv[1], movieCount);
 
@@ -269,19 +304,22 @@ int main(int argc, char *argv[])
     char* language = NULL;
     do{
         prompt = receivePrompt();
-        printf("You entered %d.\n", prompt);
         switch(prompt){
             case 1:
                 year = getSpecifiedYear();
                 printMovieFromYear(year, list);
                 free(year);
+                break;
             case 2:
+                printYearHighestRatedMovie(list);
+                break;
             case 3:
                 language = getSpecifiedLanguage();
                 printMovieFromLanguage(language, list);
                 free(language);
+                break;
             case 4:
-                continue;
+                break;
             default:
                 invalidPrompt();
         }
