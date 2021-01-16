@@ -125,7 +125,7 @@ struct movie* processFile(char *filePath)
 }
 
 /*
-* Print data for the given student
+* Print data for the given movie
 */
 void printMovie(struct movie* aMovie){
   printf("%s %s %s %s\n", aMovie->title,
@@ -157,6 +157,7 @@ int getListLength(struct movie* list)
     return movieCount;
 }
 
+// Output prompt options and receive a prompt input.
 int receivePrompt(void)
 {
     printf("\n");
@@ -169,7 +170,45 @@ int receivePrompt(void)
     
     char* prompt = calloc(sizeof(char), 16);
     scanf("%s", prompt);
-    return atoi(prompt);
+    int iPrompt = atoi(prompt);
+    free(prompt);
+    return iPrompt;
+}
+
+// PROMPT 1
+// Get the specified year
+char* getSpecifiedYear(void){
+    char* year = calloc(sizeof(char), 4);
+    printf("Enter the year for which you want to see movies: ");
+    scanf("%s", year);
+    return year;
+}
+
+// Print movies for the specified year (prompt 1)
+void printMovieFromYear(char* year, struct movie* list)
+{
+    int count = 0;
+    while (list != NULL)
+    {
+        if(strcmp(list->year, year) == 0)
+        {
+            printf("%s\n", list->title);
+            count++;
+        }
+        list = list->next;
+    }
+
+    if (count == 0)
+    {
+        printf("No data about movies released in the year %s.\n", year);
+    }
+}
+
+// Prompt was not a valid choice, notify user.
+void invalidPrompt(void)
+{
+    printf("You entered an incorrect choice. Try again.\n");
+    return;
 }
 
 /*
@@ -187,14 +226,29 @@ int main(int argc, char *argv[])
         printf("Example usage: ./movies movies_info.txt\n");
         return EXIT_FAILURE;
     }
+
     struct movie* list = processFile(argv[1]);
     // printMovieList(list);
     int movieCount = getListLength(list);
     printf("Processed file %s and parsed data for %d movies.\n", argv[1], movieCount);
+
     int prompt;
+    char* year = NULL;
     do{
         prompt = receivePrompt();
         printf("You entered %d.\n", prompt);
+        switch(prompt){
+            case 1:
+                year = getSpecifiedYear();
+                printMovieFromYear(year, list);
+                free(year);
+            case 2:
+            case 3:
+            case 4:
+                continue;
+            default:
+                invalidPrompt();
+        }
     } while(prompt != 4);   
 
     return EXIT_SUCCESS;
